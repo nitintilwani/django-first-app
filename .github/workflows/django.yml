@@ -29,7 +29,7 @@ jobs:
       run: |
         python mysite/manage.py test
     - name: Pushing Image
-      uses: mr-smithers-excellent/docker-build-push@v5
+      uses: mr-smithers-excellent/docker-build-push@v4
       with:
         image: nitintilwani/django-github-actions
         registry: docker.io
