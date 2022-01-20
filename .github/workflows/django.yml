@@ -52,7 +52,7 @@ jobs:
           
             docker image pull nitintilwani/django-github-actions:v1
             docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
-            docker stop `docker ps -a -q  --filter ancestor=nitintilwani/django-github-actions:v1`
+            docker rm -f `docker ps -a -q  --filter ancestor=nitintilwani/django-github-actions:v1`
             docker run -d -p 1234:8000 nitintilwani/django-github-actions:v1
             
             
