@@ -1,0 +1,63 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run Tests
+      run: |
+        python mysite/manage.py test
+    - name: Pushing Image
+      uses: mr-smithers-excellent/docker-build-push@v5
+      with:
+        image: nitintilwani/django-github-actions
+        registry: docker.io
+        tags: v1
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+  Deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Deploy in EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host:  ${{ secrets.HOSTNAME  }}
+          username: ${{ secrets.USER_NAME  }}
+          key: ${{ secrets.AWS_PRIVATE_KEY  }}
+          script: |
+          
+            docker image pull nitintilwani/django-github-actions:v1
+            docker rm -f django-pipeline
+            docker run -d --name django-pipeline -p 1234:8000 nitintilwani/django-github-actions:v1
+            
+            
+            
+
+
+
+        
+        
