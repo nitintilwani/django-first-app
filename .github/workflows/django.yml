@@ -51,9 +51,8 @@ jobs:
           script: |
           
             docker image pull nitintilwani/django-github-actions:v1
-            docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
-            docker rm -f `docker ps -a -q  --filter ancestor=nitintilwani/django-github-actions:v1`
-            docker run -d -p 1234:8000 nitintilwani/django-github-actions:v1
+            docker rm -f django-pipeline
+            docker run -d --name django-pipeline -p 1234:8000 nitintilwani/django-github-actions:v1
             
             
 
